@@ -634,9 +634,16 @@ bool SensorFusion::LoadMagCalibration(const char* calibrationName)
                                 struct tm nowtime;
                                 localtime_s(&nowtime, &now);
                                 ct.tm_isdst = nowtime.tm_isdst;
+#ifndef __GNUC__
+
                                 sscanf_s(caltime_str, "%d-%d-%d %d:%d:%d", 
                                     &ct.tm_year, &ct.tm_mon, &ct.tm_mday,
                                     &ct.tm_hour, &ct.tm_min, &ct.tm_sec);
+#else
+								sscanf(caltime_str, "%d-%d-%d %d:%d:%d", 
+                                    &ct.tm_year, &ct.tm_mon, &ct.tm_mday,
+                                    &ct.tm_hour, &ct.tm_min, &ct.tm_sec);	
+#endif
 #else
                                 struct tm* nowtime = localtime(&now);
                                 ct.tm_isdst = nowtime->tm_isdst;

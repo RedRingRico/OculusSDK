@@ -18,6 +18,10 @@ otherwise accompanies this software in either electronic or hard copy form.
 #include "OVR_Hash.h"
 #include "OVR_Log.h"
 
+#ifdef __GNUC__
+#include <stdint.h>
+#endif
+
 #ifdef OVR_ENABLE_THREADS
 
 // For _beginthreadex / _endtheadex
@@ -940,35 +944,53 @@ bool Thread::MSleep(unsigned msecs)
     return 1;
 }
 
+// Code from:
+// http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 void Thread::SetThreadName( const char* name )
 {
 #if !defined(OVR_BUILD_SHIPPING) || defined(OVR_BUILD_PROFILING)
     // Looks ugly, but it is the recommended way to name a thread.
+#pragma pack( push, 8 )
     typedef struct tagTHREADNAME_INFO {
         DWORD dwType;     // Must be 0x1000
         LPCSTR szName;    // Pointer to name (in user address space)
         DWORD dwThreadID; // Thread ID (-1 for caller thread)
         DWORD dwFlags;    // Reserved for future use; must be zero
     } THREADNAME_INFO;
+#pragma pack( pop )
 
     THREADNAME_INFO info;
 
+#if defined _WIN64
+#if defined __GNUC__
+	uint64_t NativeThreadID = reinterpret_cast< uint64_t >( GetThreadId( ) );
+#else
+	unsigned __int64 NativeThreadID = reinterpret_cast< unsigned __int64 >( GetThreadId( ) ); 
+#endif
+	DWORD ThreadID = ( NativeThreadID & 0x00000000FFFFFFFF );
+#else
+	DWORD	ThreadID = reinterpret_cast< DWORD >( GetThreadId( ) );
+#endif
+
     info.dwType = 0x1000;
     info.szName = name;
-    info.dwThreadID = reinterpret_cast<DWORD>(GetThreadId());
+    info.dwThreadID = ThreadID;
     info.dwFlags = 0;
 
+#ifndef __GNUC__
     __try
     {
-#ifdef _WIN64
-        RaiseException( 0x406D1388, 0, sizeof(info)/sizeof(DWORD), (const ULONG_PTR *)&info );
-#else
-        RaiseException( 0x406D1388, 0, sizeof(info)/sizeof(DWORD), (DWORD *)&info );
-#endif
+        RaiseException( 0x406D1388, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR *)&info );
     }
     __except( GetExceptionCode()==0x406D1388 ? EXCEPTION_CONTINUE_EXECUTION : EXCEPTION_EXECUTE_HANDLER )
     {
     }
+#else
+	// REMINDER!
+	// Look into structured exception handling with MinGW:
+	// http://www.programmingunlimited.net/siteexec/content.cgi?page=mingw-seh
+	// !REMINDER
+#endif // __GNUC__
 #endif // OVR_BUILD_SHIPPING
 }
 

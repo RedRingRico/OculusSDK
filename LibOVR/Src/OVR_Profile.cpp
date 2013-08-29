@@ -27,8 +27,11 @@ otherwise accompanies this software in either electronic or hard copy form.
 #include "Kernel/OVR_Allocator.h"
 #include "Kernel/OVR_Array.h"
 
+// MinGW (at least on Linux) does not provide shlobj
 #ifdef OVR_OS_WIN32
+#ifndef __GNUC__
 #include <Shlobj.h>
+#endif
 #else
 #include <dirent.h>
 #include <sys/stat.h>
@@ -51,7 +54,7 @@ String GetBaseOVRPath(bool create_dir)
     String path;
 
 #if defined(OVR_OS_WIN32)
-
+#ifndef __GNUC__
     TCHAR data_path[MAX_PATH];
     SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, NULL, 0, data_path);
     path = String(data_path);
@@ -70,6 +73,16 @@ String GetBaseOVRPath(bool create_dir)
             CreateDirectory(wpath, NULL);
         }
     }
+#else
+	// REMINDER!
+	// Look into getting FOLDERID_LocalAppData's GUID:
+	// {F1B32785-6FBA-4FCF-9D55-7B8E7F157091}from the registry or via the
+	// %USERPROFILE%\Local Settings\Application Data
+	// %LOCALAPPDATA%
+	// Paths defined on Windows
+	// !REMINDER
+	path = ".";
+#endif
         
 #elif defined(OVR_OS_MAC)
 

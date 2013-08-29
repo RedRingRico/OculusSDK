@@ -21,6 +21,7 @@ otherwise accompanies this software in either electronic or hard copy form.
 
 #include <windows.h>
 #include <setupapi.h>
+#include <ntdef.h>
 
 //-------------------------------------------------------------------------------------
 // Define needed "hidsdi.h" functionality to avoid requiring DDK installation.

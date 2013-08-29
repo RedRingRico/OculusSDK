@@ -38,7 +38,7 @@ limitations under the License.
 
 #include "../Render/Render_Device.h"
 
-#include <Windows.h>
+#include <windows.h>
 
 #if (OVR_D3D_VERSION == 10)
 #define _OVR_RENDERER_D3D10

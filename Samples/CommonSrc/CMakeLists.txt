@@ -18,13 +18,15 @@ if(WIN32)
         Render/Render_D3D11_Device.cpp
     )
 
-	find_package(DirectX REQUIRED)
-    list(APPEND CommonSrc_EXTRA_LIBS 
-    	${DirectX_D3D10_LIBRARY}
-    	${DirectX_D3D11_LIBRARY}
-    	${DirectX_LIB_SEARCH_PATH}/d3dcompiler.lib
-    	${DirectX_LIB_SEARCH_PATH}/dxgi.lib
-	)
+## REMINDER
+## This needs to be fixed for D3D
+#	find_package(DirectX REQUIRED)
+ #   list(APPEND CommonSrc_EXTRA_LIBS 
+  #  	${DirectX_D3D10_LIBRARY}
+   # 	${DirectX_D3D11_LIBRARY}
+    #	${DirectX_LIB_SEARCH_PATH}/d3dcompiler.lib
+    #	${DirectX_LIB_SEARCH_PATH}/dxgi.lib
+	#)
 
 elseif(APPLE)
 

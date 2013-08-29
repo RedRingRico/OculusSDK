@@ -22,11 +22,10 @@ if(WIN32)
 	add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 # Used by the SDK to read the EDID of the monitors
 add_subdirectory(../3rdParty/EDID "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/EDID")
-
 # LibOVR requires knowledge on the whereabouts of the EDID header
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 include_directories(${LIB_EDID_SOURCE_DIR})
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
